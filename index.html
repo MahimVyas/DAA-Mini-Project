@@ -4,8 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
+<style>body,html {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    /* background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR7MRrCyrwHC-yTAREYa7yVG73MfemaJKigw&s') no-repeat center center fixed; */
+    background-size: cover;
+    color: white;
+    margin-top: 4pc;
+    background: radial-gradient(circle, #2c3e50, #1a252f, #000000);
+    background-color: black;
+}
+.main-header {
+    background-color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    padding: 10px 0;
+}
+label {
+    font-size: 20px;
+    color: white;
+}
+h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    margin: 0;
+}
+.controls1,.controls2{
+    padding: 10px;
+    backdrop-filter: blur(20px);
+    max-width: 51%;
+    margin: auto;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 5px solid #fff;
+    background-color: rgba(255,255,255,0.2);
+}
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: white;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+button:hover {
+    background-color: #1570e8;
+    color: white;
+}
+canvas {
+    border: 5px solid #fff;
+    margin-top: 20px;
+    border-radius: 15px;
+    background: none;
+    backdrop-filter: blur(50px);
+    background-color: rgba(255,255,255,0.2);
+}
+
+/* #paths-container {
+    font-family: Arial, sans-serif;
+    margin-top: 30px;
+    color: white;
+} */
+/* .path {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+} */
+/* strong {
+    color: #333;
+} */
+#result {
+    backdrop-filter: blur(50px);
+    padding: 10px;
+    border-radius: 10px;
+    margin:auto;
+    max-width: 51%;
+    font-size: 20px;
+    margin-top: 20px;
+    border: 5px solid #fff;
+    background-color: rgba(255,255,255,0.2);
+}</style>
     <header class="main-header"><h1>Traveling Salesperson Problem</h1></header>
     <body>
         <div class="controls1">
@@ -30,5 +118,5 @@
     <footer class="main-footer"><h2>Project By: Mahim Vyas & Aayush Panchal</h2>
         <h2>Submitted to: Pragati Choudhary</h2>
     </footer>
-    <script src="script.js" defer></script>
+    <script src="/script.js" defer></script>
 </html>
