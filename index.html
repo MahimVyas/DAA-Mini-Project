@@ -3,210 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/style.css">
+    <title>TSP Visualization | DAA Mini Project</title>
+    <style>
+        body, html {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: radial-gradient(circle, #2c3e50, #1a252f, #000000);
+            background-size: cover;
+            background-color: black;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        .main-header {
+            background-color: white;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            font-size: 18px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            margin: 0;
+        }
+
+        /* Controls */
+        .controls1, .controls2 {
+            padding: 10px;
+            backdrop-filter: blur(20px);
+            width: 90%;
+            margin: 10px auto;
+            border-radius: 10px;
+            border: 3px solid #fff;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: white;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1570e8;
+            color: white;
+        }
+
+        /* Canvas */
+        canvas {
+            border: 3px solid #fff;
+            margin-top: 10px;
+            border-radius: 10px;
+            width: 90%;
+            height: auto;
+            background: none;
+            backdrop-filter: blur(50px);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Results */
+        #result {
+            backdrop-filter: blur(50px);
+            padding: 10px;
+            border-radius: 10px;
+            width: 90%;
+            font-size: 16px;
+            margin: 10px auto;
+            border: 3px solid #fff;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
 </head>
-<style>body,html {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    /* background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR7MRrCyrwHC-yTAREYa7yVG73MfemaJKigw&s') no-repeat center center fixed; */
-    background-size: cover;
-    color: white;
-    margin-top: 4pc;
-    background: radial-gradient(circle, #2c3e50, #1a252f, #000000);
-    background-color: black;
-}
-.main-header {
-    background-color: white;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 10;
-    padding: 10px 0;
-}
-label {
-    font-size: 20px;
-    color: white;
-}
-h1 {
-    font-size: 36px;
-    font-weight: bold;
-    color: #333;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    margin: 0;
-}
-.controls1,.controls2{
-    padding: 10px;
-    backdrop-filter: blur(20px);
-    max-width: 51%;
-    margin: auto;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    border: 5px solid #fff;
-    background-color: rgba(255,255,255,0.2);
-}
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: white;
-    color: #333;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-button:hover {
-    background-color: #1570e8;
-    color: white;
-}
-canvas {
-    border: 5px solid #fff;
-    margin-top: 20px;
-    border-radius: 15px;
-    background: none;
-    backdrop-filter: blur(50px);
-    background-color: rgba(255,255,255,0.2);
+
+<header class="main-header">
+    <h1>Traveling Salesperson Problem</h1>
+</header>
+
+<body>
+    <div class="controls1">
+        <label for="num-locations">Number of Locations:</label>
+        <input type="number" id="num-locations" min="2" value="5" required>
+        <button onclick="generateCoordinates()">Generate Points</button>
+        <button onclick="calculateTSP()">Find Shortest Path</button>
+    </div>
+
+    <canvas id="tspCanvas" height="1000" width="700"></canvas>
+
+    <div id="result">
+        <h3>Optimal Route:</h3>
+        <p id="route"></p>
+        <h3>Total Distance:</h3>
+        <p id="distance"></p>
+    </div>
+</body>
+
+<footer class="main-footer">
+    <h2>Project By: Mahim Vyas & Aayush Panchal</h2>
+    <h2>Submitted to: Pragati Choudhary</h2>
+</footer>
+
+<script>
+// Canvas and Context
+const canvas = document.getElementById("tspCanvas");
+const ctx = canvas.getContext("2d");
+let points = [];
+
+// Customizable Colors
+const COLORS = { point: "orange", path: "white", label: "orange" };
+
+// Generate Random Coordinates
+function generateCoordinates() {
+    const numLocations = +document.getElementById("num-locations").value;
+    if (numLocations < 2) return alert("Please enter at least 2 locations!");
+
+    points = Array.from({ length: numLocations }, (_, i) => ({
+        x: Math.random() * (canvas.width - 40) + 20, // Padding of 20
+        y: Math.random() * (canvas.height - 40) + 20,
+    }));
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear Canvas
+    points.forEach((p, i) => drawPoint(p, i + 1));
 }
 
-/* #paths-container {
-    font-family: Arial, sans-serif;
-    margin-top: 30px;
-    color: white;
-} */
-/* .path {
-    margin: 10px 0;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 5px;
-} */
-/* strong {
-    color: #333;
-} */
-#result {
-    backdrop-filter: blur(50px);
-    padding: 10px;
-    border-radius: 10px;
-    margin:auto;
-    max-width: 51%;
-    font-size: 20px;
-    margin-top: 20px;
-    border: 5px solid #fff;
-    background-color: rgba(255,255,255,0.2);
-}</style>
-    <header class="main-header"><h1>Traveling Salesperson Problem</h1></header>
-    <body>
-        <div class="controls1">
-            <label for="num-locations">Number of Locations:</label>
-            <input type="number" id="num-locations" min="2" value="5" required>
-            <button onclick="generateCoordinates()">Generate Points</button>
-            <button onclick="calculateTSP()">Find Shortest Path</button>
-        </div>
-        <!-- <div class="controls2">
-            <textarea id="coordinates" placeholder="Enter coordinates (latitude, longitude) separated by new lines"></textarea>
-            <button onclick="generateFromCoordinates()">Generate Points</button>
-            <button onclick="calculateTSP()">Find Shortest Path</button>
-        </div> -->
-        <canvas id="tspCanvas" width="1200" height="900"></canvas>
-        <div id="result">
-            <h3>Optimal Route:</h3>
-            <p id="route"></p>
-            <h3>Total Distance:</h3>
-            <p id="distance"></p>
-        </div>
-    </body>
-    <footer class="main-footer"><h2>Project By: Mahim Vyas & Aayush Panchal</h2>
-        <h2>Submitted to: Pragati Choudhary</h2>
-    </footer>
-    <script defer>// Canvas and Context
-        const canvas = document.getElementById("tspCanvas");
-        const ctx = canvas.getContext("2d");
-        let points = [];
+// Draw a Point
+function drawPoint({ x, y }, label) {
+    ctx.fillStyle = COLORS.point;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = COLORS.label;
+    ctx.fillText(label, x + 8, y + 5); // Offset for better visibility
+}
+
+// Calculate Shortest Path (Nearest Neighbor)
+function calculateTSP() {
+    if (points.length < 2) return alert("Generate at least 2 points first!");
+
+    let visited = Array(points.length).fill(false),
+        route = [0],
+        totalDistance = 0;
         
-        // Customizable Colors
-        const COLORS = { point: "orange", path: "white", label: "orange" };
-        
-        // Generate Random Coordinates
-        function generateCoordinates() {
-            const numLocations = +document.getElementById("num-locations").value;
-            if (numLocations < 2) return alert("Please enter at least 2 locations!");
-        
-            points = Array.from({ length: numLocations }, (_, i) => ({
-                x: Math.random() * (canvas.width - 40) + 20, // Padding of 20
-                y: Math.random() * (canvas.height - 40) + 20,
-            }));
-        
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear Canvas
-            points.forEach((p, i) => drawPoint(p, i + 1));
-        }
-        
-        // Draw a Point
-        function drawPoint({ x, y }, label) {
-            ctx.fillStyle = COLORS.point;
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        
-            ctx.fillStyle = COLORS.label;
-            ctx.fillText(label, x + 8, y + 5); // Offset for better visibility
-        }
-        
-        // Calculate Shortest Path (Nearest Neighbor)
-        function calculateTSP() {
-            if (points.length < 2) return alert("Generate at least 2 points first!");
-        
-            let visited = Array(points.length).fill(false),
-                route = [0],
-                totalDistance = 0;
-        
-            visited[0] = true;
-        
-            for (let i = 0; i < points.length - 1; i++) {
-                const { next, distance } = findNearest(points[route[i]], visited);
-                route.push(next);
-                visited[next] = true;
-                totalDistance += distance;
-            }
-        
-            // Add distance back to start
-            totalDistance += calcDistance(points[route.at(-1)], points[route[0]]);
-            document.getElementById("route").textContent = route.map(r => r + 1).join(" -> ");
-            document.getElementById("distance").textContent = totalDistance.toFixed(2);
-        
-            visualizeRoute(route);
-        }
-        
-        // Find Nearest Point
-        function findNearest(current, visited) {
-            return points.reduce(
-                (nearest, point, i) =>
-                    !visited[i] && calcDistance(current, point) < nearest.distance
-                        ? { next: i, distance: calcDistance(current, point) }
-                        : nearest,
-                { next: -1, distance: Infinity }
-            );
-        }
-        
-        // Calculate Distance
-        const calcDistance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-        
-        // Visualize the TSP Route
-        function visualizeRoute(route) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear Canvas
-            route.forEach((i, idx) => {
-                drawPoint(points[i], i + 1);
-                if (idx > 0) drawLine(points[route[idx - 1]], points[i]);
-            });
-            drawLine(points[route.at(-1)], points[route[0]]); // Close the loop
-        }
-        
-        // Draw Line Between Two Points
-        function drawLine(start, end) {
-            ctx.strokeStyle = COLORS.path;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(start.x, start.y);
-            ctx.lineTo(end.x, end.y);
-            ctx.stroke();
-        }</script>
+    visited[0] = true;
+
+    for (let i = 0; i < points.length - 1; i++) {
+        const { next, distance } = findNearest(points[route[i]], visited);
+        route.push(next);
+        visited[next] = true;
+        totalDistance += distance;
+    }
+
+    // Add distance back to start
+    totalDistance += calcDistance(points[route.at(-1)], points[route[0]]);
+    document.getElementById("route").textContent = route.map(r => r + 1).join(" -> ");
+    document.getElementById("distance").textContent = totalDistance.toFixed(2);
+
+    visualizeRoute(route);
+}
+
+// Find Nearest Point
+function findNearest(current, visited) {
+    return points.reduce(
+        (nearest, point, i) =>
+            !visited[i] && calcDistance(current, point) < nearest.distance
+                ? { next: i, distance: calcDistance(current, point) }
+                : nearest,
+        { next: -1, distance: Infinity }
+    );
+}
+
+// Calculate Distance
+const calcDistance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+// Visualize the TSP Route
+function visualizeRoute(route) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear Canvas
+    route.forEach((i, idx) => {
+        drawPoint(points[i], i + 1);
+        if (idx > 0) drawLine(points[route[idx - 1]], points[i]);
+    });
+    drawLine(points[route.at(-1)], points[route[0]]); // Close the loop
+}
+
+// Draw Line Between Two Points
+function drawLine(start, end) {
+    ctx.strokeStyle = COLORS.path;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+}
+</script>
+
 </html>
